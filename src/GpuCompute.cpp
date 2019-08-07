@@ -1,6 +1,6 @@
 //
 // created by antoniomechas, 2015/06/17
-// 
+//
 // some code stolen and modified from Neil Mendoza's gpuParticleSystem
 // https://github.com/neilmendoza/ofxGpuParticles
 //
@@ -16,7 +16,7 @@ const string GpuCompute::UNIFORM_PREFIX = "gpuCompute";
 GpuCompute::GpuCompute() : currentReadFbo(0)
 {
 }
-    
+
 //-------------------------------------------------------
 //
 void GpuCompute::init(unsigned width, unsigned height)
@@ -24,7 +24,7 @@ void GpuCompute::init(unsigned width, unsigned height)
     this->width = width;
     this->height = height;
     numFloats = width * height * FLOATS_PER_TEXEL;
-        
+
     // fbos
     ofFbo::Settings s;
     s.internalformat = GL_RGBA32F_ARB;
@@ -46,13 +46,13 @@ void GpuCompute::init(unsigned width, unsigned height)
     drawFbo.allocate(width,height);
     updateShader.load("update");
     drawShader.load("draw");
-		
-	imagen.loadImage("images/fondo.jpg");
+
+	imagen.loadImage("images/water-3.png");
 	imagen.resize(width,height);
 	imagen.update();
 	tex.loadData(imagen.getPixelsRef());
 }
-    
+
 
 //-------------------------------------------------------
 //
@@ -76,12 +76,12 @@ void GpuCompute::update()
     updateShader.end();
 
 	glPopAttrib();
-        
+
     fbos[1 - currentReadFbo].end();
-        
+
     currentReadFbo = 1 - currentReadFbo;
 }
-    
+
 //-------------------------------------------------------
 //
 void GpuCompute::draw()
@@ -89,7 +89,7 @@ void GpuCompute::draw()
 	drawFbo.begin();
 		drawShader.begin();
 		setUniforms(drawShader);
-		
+
 		ofVec2f r(width, height);
 		drawShader.setUniform2fv("resolution", r.getPtr());
 		drawShader.setUniformTexture("tex", tex,2);
@@ -101,7 +101,7 @@ void GpuCompute::draw()
 
 	drawFbo.draw(0,0,width,height);
 }
-    
+
 //-------------------------------------------------------
 //
 void GpuCompute::setUniforms(ofShader& shader)
@@ -114,7 +114,7 @@ void GpuCompute::setUniforms(ofShader& shader)
         shader.setUniformTexture(oss.str().c_str(), fbos[currentReadFbo].getTextureReference(i), i);
     }
 }
-    
+
 //-------------------------------------------------------
 //
 void GpuCompute::loadDataTexture(unsigned idx, float* data,
@@ -130,7 +130,7 @@ void GpuCompute::loadDataTexture(unsigned idx, float* data,
     }
     else ofLogError() << "Trying to load data from array into non-existent buffer.";
 }
-    
+
 //-------------------------------------------------------
 //
 void GpuCompute::zeroDataTexture(unsigned idx,
@@ -143,7 +143,7 @@ void GpuCompute::zeroDataTexture(unsigned idx,
     loadDataTexture(idx, zeroes, x, y, width, height);
     delete[] zeroes;
 }
-    
+
 //-------------------------------------------------------
 //
 void GpuCompute::texturedQuad()
@@ -152,15 +152,15 @@ void GpuCompute::texturedQuad()
     glBegin(GL_QUADS);
     glTexCoord2f(0, 0);
     glVertex3f(0, 0, 0);
-        
+
     glTexCoord2f(1, 0);
     glVertex3f(width, 0, 0);
-        
+
     glTexCoord2f(1, 1);
     glVertex3f(width, height, 0);
-        
+
     glTexCoord2f(0, 1);
     glVertex3f(0, height, 0);
     glEnd();
 }
-    
+
